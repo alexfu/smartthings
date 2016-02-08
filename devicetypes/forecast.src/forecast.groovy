@@ -24,7 +24,13 @@ metadata {
     input(name: "frequency", type: "number",
       title: "Refresh rate in minutes",
       displayDuringSetup: true,
+      required: false,
       defaultValue: 60)
+
+    input(name: "forecastApiKey", type: "string",
+      title: "Forecast API Key",
+      displayDuringSetup: true,
+      required: true)
   }
 
   tiles {
@@ -86,8 +92,8 @@ def refresh() {
 
 def fetchCurrentWeather() {
     def params = [
-    	uri: "https://api.forecast.io",
-    	path: "/forecast/0785457ddb7722441aa8aa0dfde8eb43/39.356848,-76.513965"
+      uri: "https://api.forecast.io",
+      path: "/forecast/$forecastApiKey/39.356848,-76.513965"
     ]
     try {
     	log.debug "Fetching current weather..."
