@@ -93,10 +93,10 @@ def refresh() {
 def fetchCurrentWeather() {
     def params = [
       uri: "https://api.forecast.io",
-      path: "/forecast/$forecastApiKey/39.356848,-76.513965"
+      path: "/forecast/$forecastApiKey/$location.latitude,$location.longitude"
     ]
     try {
-    	log.debug "Fetching current weather..."
+      log.info "Fetching current weather..."
         httpGet(params) { resp ->
             def units = resp.data.flags.units == "us" ? "F" : "C"
             def temp = resp.data.currently.temperature
