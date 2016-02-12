@@ -21,7 +21,8 @@ metadata {
   }
 
   preferences {
-    input(name: "frequency", type: "number",
+    input(name: "frequency", type: "enum",
+      options: [5, 10, 15, 30, 60, 180]
       title: "Refresh rate in minutes",
       displayDuringSetup: true,
       required: false,
@@ -67,6 +68,7 @@ def parse(String description) {
 
 def installed() {
   fetchCurrentWeather()
+  startSchedule()
 }
 
 def uninstalled() {
@@ -76,6 +78,7 @@ def uninstalled() {
 def updated() {
   unschedule()
   fetchCurrentWeather()
+  startSchedule()
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -89,6 +92,29 @@ def refresh() {
 ////////////////////////////////////////////////////////////////////////////////
 // Custom methods
 ////////////////////////////////////////////////////////////////////////////////
+
+def startSchedule() {
+  switch(frequency) {
+    case 5:
+      runEvery5Minutes(fetchCurrentWeather)
+      break;
+    case 10:
+      runEvery10Minutes(fetchCurrentWeather)
+      break;
+    case 15:
+      runEvery15Minutes(fetchCurrentWeather)
+      break;
+    case 30:
+      runEvery30Minutes(fetchCurrentWeather)
+      break;
+    case 60:
+      runEvery1Hour(fetchCurrentWeather)
+      break;
+    case 180:
+      runEvery3Hours(fetchCurrentWeather)
+      break;
+  }
+}
 
 def fetchCurrentWeather() {
     def params = [
@@ -106,9 +132,7 @@ def fetchCurrentWeather() {
             sendEvent(name: "temperature", value: temp, unit: units)
 
             // Schedule next weather check
-            def timeInSec = frequency * 60
-            log.info "Next weather check in $timeInSec seconds"
-            runIn(timeInSec, fetchCurrentWeather)
+            log.info "Next weather check in $frequency minutes"
         }
     } catch(error) {
     	log.error "Error fetching current weather $error"
